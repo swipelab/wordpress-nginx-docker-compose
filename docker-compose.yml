@@ -9,11 +9,19 @@ services:
     volumes:
       - ./nginx/default.conf:/tmp/default.template
       - ./src:/var/www/html:rw,cached
-      - ./certs:/etc/certs
+      - ./certs:/etc/certs      
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
     depends_on:
       - wordpress
     restart: always
     entrypoint: /bin/bash -c 'cat /tmp/default.template | sed "s/\\\$$domain/${DOMAIN}/g" > /etc/nginx/conf.d/default.conf && nginx -g "daemon off;"'
+
+  certbot:
+    image: certbot/certbot  
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
 
   mysql:
     image: mariadb
